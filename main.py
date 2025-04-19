@@ -91,31 +91,37 @@ turtle.done()
 
 import turtle
 import random
+import time
 
 #random_color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 
 screen = turtle.Screen()
 screen.setup(width=600, height=600)  # You can also let it default
 
-# e.g. positions from –280 up to +280 in steps of 20
+#positions from –280 up to +280 in steps of 20
 apple_positions = list(range(-280, 281, 20))
+
+apple = turtle.Turtle("square")
+apple.speed(0)
+apple.penup()
+apple.color("red")
+apple.goto(random.choice(apple_positions), random.choice(apple_positions))
+
+direction = "right" # initial directionS
 
 
 snake_segments = []
 
+speed = 3
 def add_segment(position):
+    global speed
     segment = turtle.Turtle("square")
     segment.color("green")
     segment.penup()
+    segment.speed(0)
     segment.goto(position)
+    segment.speed(speed)
     snake_segments.append(segment)
-
-add_segment((0, 0)) # first 3 segments
-add_segment((-20,0))
-add_segment((-40,0))
-
-direction = "right" # initial directionS
-
 def move_snake():
     # Move segments from tail to head
     for i in range(len(snake_segments) - 1, 0, -1):
@@ -133,6 +139,11 @@ def move_snake():
         head.setx(head.xcor() - 20)
     elif direction == "right":
         head.setx(head.xcor() + 20)
+
+def collisions():
+    if snake_segments[0].position() == apple.position():
+        add_segment(apple.position())
+        apple.goto(random.choice(apple_positions), random.choice(apple_positions))
 
 def move_up():
     global direction
@@ -152,25 +163,22 @@ def move_right():
     global direction
     if direction != "left":
         direction = "right"
-
-
-
 screen.listen()
 screen.onkey(move_up, "Up")
 screen.onkey(move_down, "Down")
 screen.onkey(move_left, "Left")
 screen.onkey(move_right, "Right")
 
-apple = turtle.Turtle("square")
-apple.speed(0)
-apple.penup()
-apple.color("red")
-apple.goto(random.choice(apple_positions), random.choice(apple_positions))
+add_segment((0, 0)) # first 3 segments
+add_segment((-20,0))
+add_segment((-40,0))
 
 
-#if segment
 
 while True:
+    screen.tracer(0)
     move_snake()
-
+    screen.update()
+    collisions()
+    time.sleep(0.15)
 turtle.done()
